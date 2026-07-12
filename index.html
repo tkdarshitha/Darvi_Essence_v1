@@ -4931,7 +4931,6 @@ function showStorageWarning(show){
 function collectPersistedState(){
   return {
     v: 1,
-    savedAt: new Date().toISOString(),
     inventory, nextInvId,
     rawMaterials, nextRawId,
     packingCosts,
@@ -5042,18 +5041,45 @@ function renderAll(){
    source and isn't cryptographically secret; it's a "keep casual visitors
    out" gate, not bank-grade security. Pair it with the matching Firestore
    rule (see setup notes) so writes are actually rejected without it too. */
-const APP_PASSCODE = "MandyaDarvi";
+const APP_PASSCODE = "Mandyadarvi";
 const PASSCODE_STORAGE_KEY = "darvi_essence_unlocked_v1";
 
 function startApp(){
+  /* Suspend saving until we've pulled down the real shared data — otherwise a brand-new browser
+     with no local copy would render blank/default data and immediately autosave that blank state
+     to the cloud, wiping out everyone else's real data before it ever gets a chance to download it. */
+  _suspendAutosave = true;
   loadPersistedState();
   populateProductSelect();
-  renderAll();
-  initCloudSync();
-  window.addEventListener("beforeunload", persistState);
-  window.addEventListener("pagehide", persistState);
-  document.addEventListener("visibilitychange", ()=>{ if(document.hidden) persistState(); });
-  setInterval(persistState, 12000);
+  renderAll(); // fast local paint (from this browser's cache, if any); nothing is saved yet
+
+  const finishBoot = ()=>{
+    _suspendAutosave = false;
+    window.addEventListener("beforeunload", persistState);
+    window.addEventListener("pagehide", persistState);
+    document.addEventListener("visibilitychange", ()=>{ if(document.hidden) persistState(); });
+    setInterval(persistState, 12000);
+  };
+
+  if(_cloudEnabled){
+    CLOUD_DOC().get().then(doc=>{
+      if(doc.exists){
+        const data = doc.data();
+        if(data && data.json && data.json !== _lastSavedJSON){
+          _applyingRemoteUpdate = true;
+          try{ if(applyPersistedJSON(data.json)) renderAll(); }
+          finally{ _applyingRemoteUpdate = false; }
+        }
+      }
+    }).catch(err=>{
+      console.error("Darvi Essence: could not load the shared cloud data on startup — showing this device's local copy instead.", err);
+    }).finally(()=>{
+      finishBoot();
+      initCloudSync(); // now listen for live updates from other people going forward
+    });
+  } else {
+    finishBoot();
+  }
 }
 
 function checkPasscode(){
