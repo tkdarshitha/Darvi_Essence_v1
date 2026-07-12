@@ -4886,12 +4886,21 @@ try{
 }catch(err){ console.error("Darvi Essence: cloud sync could not start — falling back to this browser only.", err); }
 const CLOUD_DOC = ()=> _cloudDb.collection("darviEssence").doc("sharedState");
 
+let _cloudWriteFailed = false;
 function initCloudSync(){
   if(!_cloudEnabled) return;
   CLOUD_DOC().onSnapshot(doc=>{
     if(!doc.exists) return;
     const data = doc.data();
     if(!data || !data.json || data.json === _lastSavedJSON) return; // ignore the echo of our own write
+    if(_cloudWriteFailed){
+      /* Our last save to the cloud was rejected (e.g. a Firestore Rules/passcode mismatch), so this
+         incoming snapshot is stale, older data — NOT a real update from someone else. Applying it
+         would silently undo whatever the person just did locally (e.g. a delete "not working").
+         Keep our local version and retry pushing it instead of accepting theirs. */
+      persistState();
+      return;
+    }
     _applyingRemoteUpdate = true;
     try{
       if(applyPersistedJSON(data.json)) renderAll();
@@ -4956,22 +4965,28 @@ function persistState(){
     setSaveStatus("error");
     return;
   }
-  if(json === _lastSavedJSON) return; // nothing changed, skip the write
+  if(json === _lastSavedJSON && !_cloudWriteFailed) return; // nothing changed and any previous write already succeeded
   try{
     localStorage.setItem(STORAGE_KEY, json);
     _lastSavedJSON = json;
-    setSaveStatus("saved");
     showStorageWarning(false);
   }catch(err){
     console.error("Darvi Essence: could not save to this browser's storage — is it private/incognito mode, or full?", err);
     setSaveStatus("error");
     showStorageWarning(true);
+    return;
   }
   if(_cloudEnabled){
     setSaveStatus("saving");
     CLOUD_DOC().set({ json, passcode: APP_PASSCODE, updatedAt: firebase.firestore.FieldValue.serverTimestamp() })
-      .then(()=> setSaveStatus("saved"))
-      .catch(err=>{ console.error("Darvi Essence: could not sync to the shared cloud data.", err); setSaveStatus("error"); });
+      .then(()=>{ _cloudWriteFailed = false; setSaveStatus("saved"); })
+      .catch(err=>{
+        console.error("Darvi Essence: could not sync to the shared cloud data — check that your Firestore Rules passcode matches APP_PASSCODE exactly, and that the rule was Published.", err);
+        _cloudWriteFailed = true;
+        setSaveStatus("error");
+      });
+  } else {
+    setSaveStatus("saved");
   }
 }
 
