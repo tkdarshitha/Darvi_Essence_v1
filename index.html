@@ -294,6 +294,7 @@ thead th .sort-ic{opacity:0.4; margin-left:3px; font-size:10px;}
 thead th.sorted .sort-ic{opacity:1; color:var(--maroon);}
 #paymentsColFilterRow th{cursor:default; padding:5px 10px; background:var(--panel-2);}
 .col-filter-input{width:100%; box-sizing:border-box; padding:5px 7px; font-size:11px; font-weight:400; text-transform:none; letter-spacing:normal; border:1px solid var(--line); border-radius:5px; background:var(--panel); color:var(--ink);}
+select.col-filter-input{cursor:pointer;}
 .col-filter-input:focus{outline:none; border-color:var(--maroon);}
 tbody td{padding:10px 14px; border-bottom:1px solid var(--line); vertical-align:middle;}
 tbody tr:last-child td{border-bottom:none;}
@@ -660,9 +661,15 @@ input:focus, select:focus{border-color:var(--gold); background:var(--panel);}
             <select class="filter-select" id="platformFilter"><option value="all">All platforms</option><option value="Meesho">Meesho</option></select>
             <button class="btn small secondary" id="clearFiltersBtn">Clear filters</button>
           </div>
+          <div class="toolbar" id="ordersBulkBar" style="display:none; background:var(--panel-2); border-radius:8px; padding:8px 12px; margin-top:-6px; margin-bottom:10px;">
+            <span><b id="ordersSelectedCount">0</b> selected</span>
+            <button class="btn small secondary" id="ordersClearSelectionBtn">Clear selection</button>
+            <button class="btn small" style="background:var(--red); margin-left:auto;" id="ordersBulkDeleteBtn">🗑 Delete selected</button>
+          </div>
           <div class="table-scroll">
             <table>
               <thead><tr>
+                <th style="width:30px;"><input type="checkbox" id="ordersSelectAllCb" title="Select all"></th>
                 <th data-sort="date">Date <span class="sort-ic">↕</span></th>
                 <th data-sort="id">Order No <span class="sort-ic">↕</span></th>
                 <th>Product</th>
@@ -694,9 +701,14 @@ input:focus, select:focus{border-color:var(--gold); background:var(--panel);}
             <button class="btn small secondary" id="deleteAllInventoryBtn" style="color:var(--red);">🗑 Delete all</button>
             <button class="btn small secondary" id="undoInventoryBtn" style="display:none;">↩ Undo delete</button>
           </div>
+          <div class="toolbar" id="inventoryBulkBar" style="display:none; background:var(--panel-2); border-radius:8px; padding:8px 12px; margin-top:-6px; margin-bottom:10px;">
+            <span><b id="inventorySelectedCount">0</b> selected</span>
+            <button class="btn small secondary" id="inventoryClearSelectionBtn">Clear selection</button>
+            <button class="btn small" style="background:var(--red); margin-left:auto;" id="inventoryBulkDeleteBtn">🗑 Delete selected</button>
+          </div>
           <div class="table-scroll">
             <table>
-              <thead><tr><th data-sort="name">Product <span class="sort-ic">↕</span></th><th>HSN</th><th data-sort="qty" style="text-align:right;">Total In Stock <span class="sort-ic">↕</span></th><th>Stock level</th><th data-sort="sold" style="text-align:right;">Sold <span class="sort-ic">↕</span></th><th style="text-align:right;">Damaged</th><th data-sort="purchasePrice" style="text-align:right;">Purchase price <span class="sort-ic">↕</span></th><th data-sort="gstPaid" style="text-align:right;">GST paid <span class="sort-ic">↕</span></th><th data-sort="totalPurchase" style="text-align:right;">Total purchase <span class="sort-ic">↕</span></th><th>Status</th><th style="text-align:right;">Actions</th></tr></thead>
+              <thead><tr><th style="width:30px;"><input type="checkbox" id="inventorySelectAllCb" title="Select all"></th><th data-sort="name">Product <span class="sort-ic">↕</span></th><th>HSN</th><th data-sort="totalReceived" style="text-align:right;">Total Purchased <span class="sort-ic">↕</span></th><th data-sort="qty" style="text-align:right;">Total In Stock <span class="sort-ic">↕</span></th><th>Stock level</th><th data-sort="sold" style="text-align:right;">Sold <span class="sort-ic">↕</span></th><th data-sort="returned" style="text-align:right;">Returned</th><th style="text-align:right;">Damaged</th><th data-sort="purchasePrice" style="text-align:right;">Purchase price <span class="sort-ic">↕</span></th><th data-sort="gstPaid" style="text-align:right;">GST paid <span class="sort-ic">↕</span></th><th data-sort="totalPurchase" style="text-align:right;">Total purchase <span class="sort-ic">↕</span></th><th>Status</th><th style="text-align:right;">Actions</th></tr></thead>
               <tbody id="inventoryBody"></tbody>
               <tfoot id="inventoryFootWrap"></tfoot>
             </table>
@@ -719,10 +731,15 @@ input:focus, select:focus{border-color:var(--gold); background:var(--panel);}
             <button class="btn small secondary" id="deleteAllListingBtn" style="color:var(--red);">🗑 Delete all</button>
             <button class="btn small secondary" id="undoListingBtn" style="display:none;">↩ Undo delete</button>
           </div>
+          <div class="toolbar" id="listingBulkBar" style="display:none; background:var(--panel-2); border-radius:8px; padding:8px 12px; margin-top:-6px; margin-bottom:10px;">
+            <span><b id="listingSelectedCount">0</b> selected</span>
+            <button class="btn small secondary" id="listingClearSelectionBtn">Clear selection</button>
+            <button class="btn small" style="background:var(--red); margin-left:auto;" id="listingBulkDeleteBtn">🗑 Delete selected</button>
+          </div>
           <p class="subtle-note" style="padding:0 0 12px;">Product names and per-piece cost are pulled live from Inventory — pick the product(s) that make up each listing and the calculator works out Total cost, GST and the price to list. Bank settlement is entered once Meesho actually pays out.</p>
           <div class="table-scroll">
             <table>
-              <thead><tr><th data-sort="name">Product <span class="sort-ic">↕</span></th><th>Status</th><th data-sort="base" style="text-align:right;">Price <span class="sort-ic">↕</span></th><th style="text-align:right;">Packing</th><th style="text-align:right;">MISC</th><th style="text-align:right;">Profit</th><th style="text-align:right;">Return</th><th style="text-align:right;">Damage</th><th data-sort="total" style="text-align:right;">Total <span class="sort-ic">↕</span></th><th style="text-align:right;">GST</th><th data-sort="sell" style="text-align:right;">Selling Price <span class="sort-ic">↕</span></th><th style="text-align:right;">Delivery</th><th data-sort="meesho" style="text-align:right;">Meesho Listed Price <span class="sort-ic">↕</span></th><th data-sort="bank" style="text-align:right;">Bank <span class="sort-ic">↕</span></th><th style="text-align:right;">Actions</th></tr></thead>
+              <thead><tr><th style="width:30px;"><input type="checkbox" id="listingSelectAllCb" title="Select all"></th><th data-sort="name">Product <span class="sort-ic">↕</span></th><th>Status</th><th data-sort="base" style="text-align:right;">Price <span class="sort-ic">↕</span></th><th style="text-align:right;">Packing</th><th style="text-align:right;">MISC</th><th style="text-align:right;">Profit</th><th style="text-align:right;">Return</th><th style="text-align:right;">Damage</th><th data-sort="total" style="text-align:right;">Total <span class="sort-ic">↕</span></th><th style="text-align:right;">GST</th><th data-sort="sell" style="text-align:right;">Selling Price <span class="sort-ic">↕</span></th><th style="text-align:right;">Delivery</th><th data-sort="meesho" style="text-align:right;">Meesho Listed Price <span class="sort-ic">↕</span></th><th data-sort="bank" style="text-align:right;">Bank <span class="sort-ic">↕</span></th><th style="text-align:right;">Actions</th></tr></thead>
               <tbody id="listingBody"></tbody>
               <tfoot id="listingFootWrap"></tfoot>
             </table>
@@ -741,9 +758,15 @@ input:focus, select:focus{border-color:var(--gold); background:var(--panel);}
             <button class="btn small secondary" id="deleteAllRawBtn" style="color:var(--red);">🗑 Delete all</button>
             <button class="btn small secondary" id="undoRawBtn" style="display:none;">↩ Undo delete</button>
           </div>
+          <div class="toolbar" id="rawBulkBar" style="display:none; background:var(--panel-2); border-radius:8px; padding:8px 12px; margin-top:-6px; margin-bottom:10px;">
+            <span><b id="rawSelectedCount">0</b> selected</span>
+            <button class="btn small secondary" id="rawClearSelectionBtn">Clear selection</button>
+            <button class="btn small" style="background:var(--red); margin-left:auto;" id="rawBulkDeleteBtn">🗑 Delete selected</button>
+          </div>
           <div class="table-scroll">
             <table>
               <thead><tr>
+                <th style="width:30px;"><input type="checkbox" id="rawSelectAllCb" title="Select all"></th>
                 <th data-sort="name">Material <span class="sort-ic">↕</span></th>
                 <th>Category</th>
                 <th data-sort="qty" style="text-align:right;">Quantity <span class="sort-ic">↕</span></th>
@@ -890,23 +913,23 @@ input:focus, select:focus{border-color:var(--gold); background:var(--panel);}
               <th data-sort="margin" style="text-align:right;">Margin % <span class="sort-ic">↕</span></th>
             </tr>
             <tr id="paymentsColFilterRow">
-              <th><input type="text" class="col-filter-input" data-filter-key="dispatchDate" placeholder="Filter..."></th>
-              <th><input type="text" class="col-filter-input" data-filter-key="id" placeholder="Filter..."></th>
-              <th><input type="text" class="col-filter-input" data-filter-key="supplierSku" placeholder="Filter..."></th>
-              <th><input type="text" class="col-filter-input" data-filter-key="catalogId" placeholder="Filter..."></th>
-              <th><input type="text" class="col-filter-input" data-filter-key="liveStatus" placeholder="Filter..."></th>
-              <th><input type="text" class="col-filter-input" data-filter-key="qty" placeholder="Filter..." style="text-align:right;"></th>
-              <th><input type="text" class="col-filter-input" data-filter-key="listingPrice" placeholder="Filter..." style="text-align:right;"></th>
-              <th><input type="text" class="col-filter-input" data-filter-key="shippingCharge" placeholder="Filter..." style="text-align:right;"></th>
-              <th><input type="text" class="col-filter-input" data-filter-key="gstPct" placeholder="Filter..." style="text-align:right;"></th>
-              <th><input type="text" class="col-filter-input" data-filter-key="tcs" placeholder="Filter..." style="text-align:right;"></th>
-              <th><input type="text" class="col-filter-input" data-filter-key="tds" placeholder="Filter..." style="text-align:right;"></th>
-              <th><input type="text" class="col-filter-input" data-filter-key="settlementAmt" placeholder="Filter..." style="text-align:right;"></th>
-              <th><input type="text" class="col-filter-input" data-filter-key="paymentDate" placeholder="Filter..."></th>
-              <th><input type="text" class="col-filter-input" data-filter-key="pricePerUnit" placeholder="Filter..." style="text-align:right;"></th>
-              <th><input type="text" class="col-filter-input" data-filter-key="otherExpense" placeholder="Filter..." style="text-align:right;"></th>
-              <th><input type="text" class="col-filter-input" data-filter-key="netProfit" placeholder="Filter..." style="text-align:right;"></th>
-              <th><input type="text" class="col-filter-input" data-filter-key="margin" placeholder="Filter..." style="text-align:right;"></th>
+              <th><select class="col-filter-input" data-filter-key="dispatchDate"><option value="">All</option></select></th>
+              <th><select class="col-filter-input" data-filter-key="id"><option value="">All</option></select></th>
+              <th><select class="col-filter-input" data-filter-key="supplierSku"><option value="">All</option></select></th>
+              <th><select class="col-filter-input" data-filter-key="catalogId"><option value="">All</option></select></th>
+              <th><select class="col-filter-input" id="paymentsLiveStatusFilter" data-filter-key="liveStatus"><option value="">All</option></select></th>
+              <th><select class="col-filter-input" data-filter-key="qty" style="text-align:right;"><option value="">All</option></select></th>
+              <th><select class="col-filter-input" data-filter-key="listingPrice" style="text-align:right;"><option value="">All</option></select></th>
+              <th><select class="col-filter-input" data-filter-key="shippingCharge" style="text-align:right;"><option value="">All</option></select></th>
+              <th><select class="col-filter-input" data-filter-key="gstPct" style="text-align:right;"><option value="">All</option></select></th>
+              <th><select class="col-filter-input" data-filter-key="tcs" style="text-align:right;"><option value="">All</option></select></th>
+              <th><select class="col-filter-input" data-filter-key="tds" style="text-align:right;"><option value="">All</option></select></th>
+              <th><select class="col-filter-input" data-filter-key="settlementAmt" style="text-align:right;"><option value="">All</option></select></th>
+              <th><select class="col-filter-input" data-filter-key="paymentDate"><option value="">All</option></select></th>
+              <th><select class="col-filter-input" data-filter-key="pricePerUnit" style="text-align:right;"><option value="">All</option></select></th>
+              <th><select class="col-filter-input" data-filter-key="otherExpense" style="text-align:right;"><option value="">All</option></select></th>
+              <th><select class="col-filter-input" data-filter-key="netProfit" style="text-align:right;"><option value="">All</option></select></th>
+              <th><select class="col-filter-input" data-filter-key="margin" style="text-align:right;"><option value="">All</option></select></th>
             </tr></thead>
             <tbody id="paymentsBody"></tbody></table>
           </div>
@@ -1384,6 +1407,24 @@ const ORIGINAL_EXPENSES = JSON.parse(JSON.stringify(expenses));
 function unitsSoldFor(name){
   return orders.filter(o=> o.product.trim().toLowerCase() === name.trim().toLowerCase()).reduce((s,o)=>s+o.qty,0);
 }
+/* "Sold" for the Inventory tab only counts units that are truly a completed sale: status Delivered
+   AND payment actually received. This deliberately excludes RTO/Customer Return/RTO_LOCKED (the
+   item physically came back, so it was never really sold — those units stay available/in-stock),
+   Cancelled (never shipped), Pending (not shipped yet), and plain Shipped-with-no-payment-yet
+   (not yet confirmed as a completed sale). */
+function soldUnitsFor(name){
+  return orders.filter(o=> o.product.trim().toLowerCase() === name.trim().toLowerCase() && o.status==="Delivered" && o.bank!=null).reduce((s,o)=>s+o.qty,0);
+}
+/* Units that came back to the seller — RTO, RTO_LOCKED, or a Customer Return — shown as their own
+   Inventory column so it's clear how many units of a product have been returned. */
+/* Units that came back to the seller as a Customer Return — shown as its own Inventory column so
+   it's clear how many units of a product customers sent back. RTO (never actually delivered to the
+   customer) is deliberately excluded here — those units are still kept out of "Sold" and stay
+   available in stock, they just aren't counted as a "Return" since the customer never received them. */
+const RETURNED_STATUSES = ["Customer Return"];
+function returnedUnitsFor(name){
+  return orders.filter(o=> o.product.trim().toLowerCase() === name.trim().toLowerCase() && RETURNED_STATUSES.includes(o.status)).reduce((s,o)=>s+o.qty,0);
+}
 /* "Sold" for dashboard/reporting purposes only counts orders that actually left the warehouse or came back
    after leaving it — Shipped, Delivered, RTO, Customer Return, RTO_LOCKED. Pending (not shipped yet) and
    Cancelled (never shipped) are excluded so the count reflects real movement, not raw order volume. */
@@ -1392,9 +1433,10 @@ function qualifyingSoldUnitsFor(name){
   return orders.filter(o=> o.product.trim().toLowerCase() === name.trim().toLowerCase() && QUALIFYING_SOLD_STATUSES.includes(o.status)).reduce((s,o)=>s+o.qty,0);
 }
 function recomputeInvFields(item){
-  const sold = unitsSoldFor(item.name);
+  const sold = soldUnitsFor(item.name);
   item.sold = sold;
-  item.qty = Math.max(0, item.totalReceived - sold - (item.damaged||0)); // remaining/available stock
+  item.returned = returnedUnitsFor(item.name);
+  item.qty = Math.max(0, item.totalReceived - sold - (item.damaged||0)); // remaining/available stock — RTO/Customer Return units were never subtracted, so they're already counted as available
   item.purchase = item.totalReceived * item.pricePerP; // cost basis is on everything ever received, not just what's left
   item.gstPaid = item.purchase * item.gstPct;
   item.totalPurchase = item.purchase + item.gstPaid;
@@ -1466,6 +1508,78 @@ let paymentsProductFilterVal = "all";
 let paymentsPaymentFilterVal = "all";
 let paymentsDateFromVal = "";
 let paymentsDateToVal = "";
+
+/* ===================== BULK SELECT + DELETE (Orders / Inventory / Listing / Raw Materials) =====================
+   Every table below gets a header "select all" checkbox plus a per-row checkbox. Checking one or
+   more rows reveals a small bulk-action bar with a live count and a "Delete selected" button. That
+   button always routes through the same confirm-modal pattern used for single-item delete — bulk
+   delete never skips the "are you sure" step, and it never bypasses rules like "can't delete an
+   inventory item that already has sales against it". ---- */
+let selectedOrderIds = new Set();
+let selectedInventoryIds = new Set();
+let selectedListingIds = new Set();
+let selectedRawIds = new Set();
+
+function syncBulkBar(barId, countId, selectedSet){
+  const bar = document.getElementById(barId);
+  if(!bar) return;
+  const n = selectedSet.size;
+  bar.style.display = n>0 ? "flex" : "none";
+  const countEl = document.getElementById(countId);
+  if(countEl) countEl.textContent = n;
+}
+function syncSelectAllCb(cbId, visibleIds, selectedSet){
+  const cb = document.getElementById(cbId);
+  if(!cb) return;
+  if(!visibleIds.length){ cb.checked = false; cb.indeterminate = false; return; }
+  const selectedVisible = visibleIds.filter(id=>selectedSet.has(id));
+  cb.checked = selectedVisible.length === visibleIds.length;
+  cb.indeterminate = selectedVisible.length>0 && selectedVisible.length < visibleIds.length;
+}
+/* Wires up the header checkbox + row checkboxes + bulk bar for one table. Call this at the end of
+   that table's render function, after the rows (with .row-check checkboxes) are in the DOM. */
+function wireBulkSelect({bodyId, selectAllCbId, barId, countId, clearBtnId, deleteBtnId, selectedSet, visibleIds, onRender, onBulkDelete}){
+  syncSelectAllCb(selectAllCbId, visibleIds, selectedSet);
+  syncBulkBar(barId, countId, selectedSet);
+  document.querySelectorAll(`#${bodyId} .row-check`).forEach(cb=>{
+    cb.checked = selectedSet.has(cb.dataset.rowId);
+    cb.addEventListener("click", e=> e.stopPropagation());
+    cb.addEventListener("change", e=>{
+      const id = e.target.dataset.rowId;
+      if(e.target.checked) selectedSet.add(id); else selectedSet.delete(id);
+      syncSelectAllCb(selectAllCbId, visibleIds, selectedSet);
+      syncBulkBar(barId, countId, selectedSet);
+    });
+  });
+  const selectAllCb = document.getElementById(selectAllCbId);
+  if(selectAllCb && !selectAllCb.dataset.wired){
+    selectAllCb.dataset.wired = "1";
+    selectAllCb.addEventListener("change", e=>{
+      if(e.target.checked) visibleIds.forEach(id=>selectedSet.add(id));
+      else visibleIds.forEach(id=>selectedSet.delete(id));
+      onRender();
+    });
+  }
+  const clearBtn = document.getElementById(clearBtnId);
+  if(clearBtn && !clearBtn.dataset.wired){
+    clearBtn.dataset.wired = "1";
+    clearBtn.addEventListener("click", ()=>{ selectedSet.clear(); onRender(); });
+  }
+  const deleteBtn = document.getElementById(deleteBtnId);
+  if(deleteBtn && !deleteBtn.dataset.wired){
+    deleteBtn.dataset.wired = "1";
+    deleteBtn.addEventListener("click", onBulkDelete);
+  }
+}
+function openBulkConfirm({title, text, confirmLabel, onConfirm}){
+  const body = document.getElementById("confirmBody");
+  const foot = document.getElementById("confirmFoot");
+  body.innerHTML = `<h4 class="confirm-title">${title}</h4><p class="confirm-text">${text}</p>`;
+  foot.innerHTML = `<button class="btn secondary" id="confirmCancelBtn">Cancel</button><button class="btn" style="background:var(--red);" id="confirmDeleteBtn">${confirmLabel}</button>`;
+  document.getElementById("confirmCancelBtn").addEventListener("click", closeConfirm);
+  document.getElementById("confirmDeleteBtn").addEventListener("click", onConfirm);
+  document.getElementById("confirmOverlay").classList.add("show");
+}
 
 function esc(s){ return String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function fmt(n){ return "₹" + Number(n||0).toLocaleString("en-IN", {maximumFractionDigits:2}); }
@@ -2234,6 +2348,7 @@ function renderOrdersTable(){
       : `<span style="color:var(--ink-soft);">Pending</span>`;
     const tr = document.createElement("tr"); tr.className="clickable";
     tr.innerHTML = `
+      <td><input type="checkbox" class="row-check" data-row-id="${esc(o.id)}"></td>
       <td>${fmtDateFull(o.date)}</td>
       <td class="mono" style="font-size:11px; color:var(--ink-soft);">${esc(o.id)}</td>
       <td><div class="prod-cell"><div class="prod-thumb" style="background:${thumbColor(name)};">${esc(name.charAt(0))}</div>${esc(name)}</div></td>
@@ -2251,6 +2366,28 @@ function renderOrdersTable(){
   });
   body.querySelectorAll("[data-order-edit]").forEach(b=> b.addEventListener("click", (e)=>{ e.stopPropagation(); openOrderModal(b.dataset.orderEdit); }));
   body.querySelectorAll("[data-order-delete]").forEach(b=> b.addEventListener("click", (e)=>{ e.stopPropagation(); confirmDeleteOrder(b.dataset.orderDelete); }));
+  wireBulkSelect({
+    bodyId:"ordersBody", selectAllCbId:"ordersSelectAllCb", barId:"ordersBulkBar", countId:"ordersSelectedCount",
+    clearBtnId:"ordersClearSelectionBtn", deleteBtnId:"ordersBulkDeleteBtn",
+    selectedSet: selectedOrderIds, visibleIds: list.map(o=>o.id), onRender: renderOrdersTable,
+    onBulkDelete: ()=>{
+      const ids = list.map(o=>o.id).filter(id=>selectedOrderIds.has(id));
+      if(!ids.length) return;
+      openBulkConfirm({
+        title: `Delete ${ids.length} order(s)?`,
+        text: `This will permanently remove ${ids.length} selected order(s) from your records. This action can't be undone (unless you use "Reset to sample data").`,
+        confirmLabel: "Delete selected",
+        onConfirm: ()=>{
+          orders = orders.filter(o=>!ids.includes(o.id));
+          selectedOrderIds.clear();
+          inventory.forEach(recomputeInvFields);
+          closeConfirm();
+          renderAll();
+          populateProductSelect();
+        }
+      });
+    }
+  });
 }
 document.querySelectorAll("thead th[data-sort]").forEach(th=>{
   th.addEventListener("click", ()=>{
@@ -2306,7 +2443,8 @@ document.getElementById("paymentsClearFiltersBtn").addEventListener("click", ()=
 });
 document.querySelectorAll("#paymentsColFilterRow .col-filter-input").forEach(inp=>{
   inp.addEventListener("click", (e)=> e.stopPropagation());
-  inp.addEventListener("input", (e)=>{
+  const evtType = inp.tagName === "SELECT" ? "change" : "input";
+  inp.addEventListener(evtType, (e)=>{
     paymentsColFilters[e.target.dataset.filterKey] = e.target.value;
     renderPayments();
   });
@@ -2453,7 +2591,7 @@ function renderInventory(){
   if(invSearchTerm) list = list.filter(i=>i.name.toLowerCase().includes(invSearchTerm));
   if(invSort.key){
     list.sort((a,b)=>{
-      const map = {name:"name", qty:"qty", sold:"sold", purchasePrice:"purchase", gstPaid:"gstPaid", totalPurchase:"totalPurchase"};
+      const map = {name:"name", totalReceived:"totalReceived", qty:"qty", sold:"sold", returned:"returned", purchasePrice:"purchase", gstPaid:"gstPaid", totalPurchase:"totalPurchase"};
       let av=a[map[invSort.key]], bv=b[map[invSort.key]];
       if(typeof av === "string") return av.localeCompare(bv) * invSort.dir;
       return ((av||0)-(bv||0)) * invSort.dir;
@@ -2475,9 +2613,10 @@ function renderInventory(){
          </div>`
       : `<div class="damaged-cell"><span class="damaged-val">${item.damaged||0}</span><button class="damaged-edit-btn" title="Update damaged stock" data-edit-damaged="${item.id}">✎</button></div>`;
 
-    return `<tr><td>${esc(item.name.trim())}</td><td class="num-cell">${esc(item.hsn)}</td><td class="num-cell">${item.qty}</td>
+    return `<tr><td><input type="checkbox" class="row-check" data-row-id="${esc(item.id)}"></td><td>${esc(item.name.trim())}</td><td class="num-cell">${esc(item.hsn)}</td><td class="num-cell">${item.totalReceived}</td><td class="num-cell">${item.qty}</td>
       <td><div class="stock-bar-bg"><div class="stock-bar-fill" style="width:${pct}%; background:${level};"></div></div></td>
       <td class="num-cell">${item.sold||0}</td>
+      <td class="num-cell">${item.returned||0}</td>
       <td>${damagedCell}</td>
       <td class="num-cell">${fmt(item.purchase)}</td><td class="num-cell">${fmt(item.gstPaid)}</td><td class="num-cell">${fmt(item.totalPurchase)}</td>
       <td>${pill}</td>
@@ -2497,7 +2636,7 @@ function renderInventory(){
     const input = document.getElementById("damaged-input-"+id);
     const val = parseFloat(input.value);
     if(isNaN(val) || val<0){ input.style.borderColor = "var(--red)"; return; }
-    const sold = unitsSoldFor(item.name);
+    const sold = soldUnitsFor(item.name);
     if(val + sold > item.totalReceived){
       input.style.borderColor = "var(--red)";
       input.title = `Can't exceed available stock — only ${item.totalReceived - sold} unit(s) not yet sold.`;
@@ -2517,7 +2656,8 @@ function renderInventory(){
 
   /* ---- Stock Summary (compact single-line strip) ---- */
   const totalStock = inventory.reduce((s,i)=>s+i.totalReceived,0);
-  const totalSold = inventory.reduce((s,i)=>s+qualifyingSoldUnitsFor(i.name),0);
+  const totalSold = inventory.reduce((s,i)=>s+(i.sold||0),0);
+  const totalReturned = inventory.reduce((s,i)=>s+(i.returned||0),0);
   const totalDamaged = inventory.reduce((s,i)=>s+(i.damaged||0),0);
   const totalRemaining = inventory.reduce((s,i)=>s+i.qty,0);
   const totalPurchase = inventory.reduce((s,i)=>s+i.purchase,0);
@@ -2535,12 +2675,14 @@ function renderInventory(){
 
   /* ---- Professional totals bar ---- */
   document.getElementById("inventoryFootWrap").innerHTML = `
-    <tr><td colspan="11" style="padding:0; border:none;">
+    <tr><td colspan="14" style="padding:0; border:none;">
       <div class="totals-bar">
         <div class="t-label">📋 Grand Total — ${inventory.length} item(s)</div>
+        <div class="t-cell"><span class="t-tag">Total Purchased</span><span class="t-num">${totalStock}</span></div>
         <div class="t-cell"><span class="t-tag">Total In Stock</span><span class="t-num">${totalRemaining}</span></div>
         <div class="t-cell"></div>
         <div class="t-cell"><span class="t-tag">Sold</span><span class="t-num">${totalSold}</span></div>
+        <div class="t-cell"><span class="t-tag">Returned</span><span class="t-num">${totalReturned}</span></div>
         <div class="t-cell"><span class="t-tag">Damaged</span><span class="t-num">${totalDamaged}</span></div>
         <div class="t-cell"><span class="t-tag">Purchase</span><span class="t-num">${fmt(totalPurchase)}</span></div>
         <div class="t-cell"><span class="t-tag">GST Paid</span><span class="t-num">${fmt(totalGst)}</span></div>
@@ -2549,6 +2691,40 @@ function renderInventory(){
       </div>
     </td></tr>
   `;
+  wireBulkSelect({
+    bodyId:"inventoryBody", selectAllCbId:"inventorySelectAllCb", barId:"inventoryBulkBar", countId:"inventorySelectedCount",
+    clearBtnId:"inventoryClearSelectionBtn", deleteBtnId:"inventoryBulkDeleteBtn",
+    selectedSet: selectedInventoryIds, visibleIds: list.map(i=>i.id), onRender: renderInventory,
+    onBulkDelete: ()=>{
+      const selectedItems = list.filter(i=>selectedInventoryIds.has(i.id));
+      if(!selectedItems.length) return;
+      const blocked = selectedItems.filter(i=> soldUnitsFor(i.name) > 0);
+      const deletable = selectedItems.filter(i=> soldUnitsFor(i.name) === 0);
+      if(!deletable.length){
+        openBulkConfirm({
+          title: `Can't delete the selected item(s)`,
+          text: `All ${blocked.length} selected item(s) already have units sold in your order history. Deleting them would break those past orders and reports. Set stock to 0 instead, or rename/edit them.`,
+          confirmLabel: "OK",
+          onConfirm: closeConfirm
+        });
+        return;
+      }
+      const skipNote = blocked.length ? ` ${blocked.length} of the selected item(s) will be skipped because they already have units sold in your order history.` : "";
+      openBulkConfirm({
+        title: `Delete ${deletable.length} inventory item(s)?`,
+        text: `This will permanently remove ${deletable.length} item(s) from your inventory.${skipNote} This action can't be undone (unless you use "Reset to sample data").`,
+        confirmLabel: "Delete selected",
+        onConfirm: ()=>{
+          const deletableIds = deletable.map(i=>i.id);
+          inventory = inventory.filter(i=>!deletableIds.includes(i.id));
+          selectedInventoryIds.clear();
+          closeConfirm();
+          renderAll();
+          populateProductSelect();
+        }
+      });
+    }
+  });
 }
 document.getElementById("invSearch").addEventListener("input", e=>{ invSearchTerm=e.target.value.toLowerCase(); renderInventory(); });
 document.getElementById("invFilter").addEventListener("change", e=>{ invFilterVal=e.target.value; renderInventory(); });
@@ -2612,7 +2788,7 @@ document.getElementById("stockModalSave").addEventListener("click", ()=>{
 
   if(editingStockId){
     const item = inventory.find(i=>i.id===editingStockId);
-    const soldAlready = unitsSoldFor(name);
+    const soldAlready = soldUnitsFor(name);
     if(totalReceived - soldAlready - (item.damaged||0) < 0){
       document.getElementById("err-qty").textContent = `Can't be less than units already sold (${soldAlready}) plus damaged (${item.damaged||0}).`;
       document.getElementById("m-qty").classList.add("invalid");
@@ -2674,6 +2850,7 @@ document.getElementById("deleteAllInventoryBtn").addEventListener("click", ()=>{
   document.getElementById("confirmDeleteBtn").addEventListener("click", ()=>{
     _invDeletedSnapshot = JSON.parse(JSON.stringify(inventory));
     inventory = [];
+    selectedInventoryIds.clear();
     closeConfirm();
     renderAll();
     populateProductSelect();
@@ -2717,6 +2894,7 @@ function renderListing(){
     const statusKey = (item.status||"Available").toLowerCase().replace(/\s+/g,"");
     const stockWarn = listingHasStockIssue(item) ? '<span class="stock-warn-tag">⚠ Out of stock</span>' : "";
     return `<tr>
+      <td><input type="checkbox" class="row-check" data-row-id="${esc(item.id)}"></td>
       <td>${esc(name)}${stockWarn}</td>
       <td><span class="status-pill ${statusKey}">${item.status||"Available"}</span></td>
       <td class="num-cell">${fmt(fig.basePrice)}</td>
@@ -2736,7 +2914,7 @@ function renderListing(){
         <button class="icon-btn danger" title="Delete" data-delete-listing="${item.id}">🗑</button>
       </div></td>
     </tr>`;
-  }).join("") : `<tr><td colspan="15"><div class="empty-state"><div class="ic">🏷</div><b>No listings yet</b>Add one to work out what to list it for.</div></td></tr>`;
+  }).join("") : `<tr><td colspan="16"><div class="empty-state"><div class="ic">🏷</div><b>No listings yet</b>Add one to work out what to list it for.</div></td></tr>`;
 
   document.querySelectorAll("#listingBody [data-edit-listing]").forEach(b=> b.addEventListener("click", ()=> openListingModal(b.dataset.editListing)));
   document.querySelectorAll("#listingBody [data-delete-listing]").forEach(b=> b.addEventListener("click", ()=> confirmDeleteListing(b.dataset.deleteListing)));
@@ -2762,6 +2940,27 @@ function renderListing(){
   const badgeEl = document.getElementById("navListingBadge");
   badgeEl.textContent = qcCount;
   badgeEl.style.display = qcCount>0 ? "" : "none";
+  wireBulkSelect({
+    bodyId:"listingBody", selectAllCbId:"listingSelectAllCb", barId:"listingBulkBar", countId:"listingSelectedCount",
+    clearBtnId:"listingClearSelectionBtn", deleteBtnId:"listingBulkDeleteBtn",
+    selectedSet: selectedListingIds, visibleIds: rows.map(r=>r.item.id), onRender: renderListing,
+    onBulkDelete: ()=>{
+      const ids = rows.map(r=>r.item.id).filter(id=>selectedListingIds.has(id));
+      if(!ids.length) return;
+      openBulkConfirm({
+        title: `Delete ${ids.length} listing(s)?`,
+        text: `This removes the listing price calculation for ${ids.length} selected item(s). Your Inventory stock and past orders are not affected. This can't be undone.`,
+        confirmLabel: "Delete selected",
+        onConfirm: ()=>{
+          listing = listing.filter(l=>!ids.includes(l.id));
+          selectedListingIds.clear();
+          closeConfirm();
+          renderAll();
+          populateProductSelect();
+        }
+      });
+    }
+  });
 }
 document.getElementById("listingSearch").addEventListener("input", e=>{ listingSearchTerm=e.target.value.toLowerCase(); renderListing(); });
 document.getElementById("listingFilter").addEventListener("change", e=>{ listingFilterVal=e.target.value; renderListing(); });
@@ -2928,6 +3127,7 @@ document.getElementById("deleteAllListingBtn").addEventListener("click", ()=>{
   document.getElementById("confirmDeleteBtn").addEventListener("click", ()=>{
     _listingDeletedSnapshot = JSON.parse(JSON.stringify(listing));
     listing = [];
+    selectedListingIds.clear();
     closeConfirm();
     renderAll();
     populateProductSelect();
@@ -2971,7 +3171,7 @@ function renderRawMaterials(){
   }
   document.getElementById("rawMatBody").innerHTML = list.length ? list.map(m=>{
     const dateStr = m.purchaseDate ? new Date(m.purchaseDate+"T00:00:00").toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}) : "—";
-    return `<tr><td>${esc(m.name)}</td>
+    return `<tr><td><input type="checkbox" class="row-check" data-row-id="${esc(m.id)}"></td><td>${esc(m.name)}</td>
       <td>${m.category? `<span class="status-pill nodata">${esc(m.category)}</span>` : "—"}</td>
       <td class="num-cell">${m.qty}</td>
       <td>${esc(m.unit||"pcs")}</td>
@@ -2983,14 +3183,34 @@ function renderRawMaterials(){
         <button class="icon-btn" title="Edit" data-raw-edit="${m.id}">✎</button>
         <button class="icon-btn danger" title="Delete" data-raw-delete="${m.id}">🗑</button>
       </div></td></tr>`;
-  }).join("") : `<tr><td colspan="9" style="text-align:center; color:var(--ink-soft); padding:26px;">No raw materials match this search/filter.</td></tr>`;
+  }).join("") : `<tr><td colspan="10" style="text-align:center; color:var(--ink-soft); padding:26px;">No raw materials match this search/filter.</td></tr>`;
 
   document.querySelectorAll("#rawMatBody [data-raw-edit]").forEach(b=> b.addEventListener("click", ()=> openRawModal(b.dataset.rawEdit)));
   document.querySelectorAll("#rawMatBody [data-raw-delete]").forEach(b=> b.addEventListener("click", ()=> confirmDeleteRaw(b.dataset.rawDelete)));
 
   const totQty = list.reduce((s,m)=>s+m.qty,0);
   const totCost = list.reduce((s,m)=>s+m.totalCost,0);
-  document.getElementById("rawMatFoot").innerHTML = `<td>Grand total</td><td></td><td class="num-cell">${totQty}</td><td></td><td></td><td class="num-cell">${fmt(totCost)}</td><td></td><td></td><td></td>`;
+  document.getElementById("rawMatFoot").innerHTML = `<td></td><td>Grand total</td><td></td><td class="num-cell">${totQty}</td><td></td><td></td><td class="num-cell">${fmt(totCost)}</td><td></td><td></td><td></td>`;
+  wireBulkSelect({
+    bodyId:"rawMatBody", selectAllCbId:"rawSelectAllCb", barId:"rawBulkBar", countId:"rawSelectedCount",
+    clearBtnId:"rawClearSelectionBtn", deleteBtnId:"rawBulkDeleteBtn",
+    selectedSet: selectedRawIds, visibleIds: list.map(m=>m.id), onRender: renderRawMaterials,
+    onBulkDelete: ()=>{
+      const ids = list.map(m=>m.id).filter(id=>selectedRawIds.has(id));
+      if(!ids.length) return;
+      openBulkConfirm({
+        title: `Delete ${ids.length} raw material line(s)?`,
+        text: `This permanently removes ${ids.length} selected raw material &amp; packaging stock line(s). This can't be undone.`,
+        confirmLabel: "Delete selected",
+        onConfirm: ()=>{
+          rawMaterials = rawMaterials.filter(m=>!ids.includes(m.id));
+          selectedRawIds.clear();
+          closeConfirm();
+          renderAll();
+        }
+      });
+    }
+  });
 }
 document.getElementById("rawSearch").addEventListener("input", e=>{ rawSearchTerm=e.target.value.toLowerCase(); renderRawMaterials(); });
 document.getElementById("rawCatFilter").addEventListener("change", e=>{ rawCatFilterVal=e.target.value; renderRawMaterials(); });
@@ -3304,6 +3524,7 @@ document.getElementById("deleteAllRawBtn").addEventListener("click", ()=>{
   document.getElementById("confirmDeleteBtn").addEventListener("click", ()=>{
     _rawDeletedSnapshot = JSON.parse(JSON.stringify(rawMaterials));
     rawMaterials.length = 0;
+    selectedRawIds.clear();
     closeConfirm();
     renderRawMaterials();
     renderPackMaterialPicker();
@@ -3484,11 +3705,12 @@ function getReverseShipFee(){
    o.status only when there's no payment record yet (nothing to derive from). */
 function getPaymentStatus(o){
   const pd = o.paymentDetails;
+  let status = o.status;
   if(pd && pd.liveStatus){
     const mapped = MEESHO_STATUS_MAP[pd.liveStatus];
-    if(mapped) return mapped;
+    if(mapped) status = mapped;
   }
-  return o.status;
+  return resolveOrderStatus(status, pd ? pd.settlementAmount : null);
 }
 function getOrderLedgerFigures(o){
   const inv = findInventoryByName(o.product);
@@ -3617,6 +3839,7 @@ function renderPaymentTabs(){
   const statusFilterEl = document.getElementById("paymentsStatusFilter");
   if(statusFilterEl) statusFilterEl.value = activePaymentStatusTab;
   populatePaymentsProductFilter();
+  populatePaymentsColFilterSelects();
 }
 function populatePaymentsProductFilter(){
   const sel = document.getElementById("paymentsProductFilter");
@@ -3626,6 +3849,45 @@ function populatePaymentsProductFilter(){
   const products = [...new Set(allPaid.map(o=>o.product.trim()))].filter(Boolean).sort((a,b)=>a.localeCompare(b));
   sel.innerHTML = `<option value="all">All products</option>` + products.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join("");
   if(products.includes(prevVal)){ sel.value = prevVal; } else { sel.value = "all"; paymentsProductFilterVal = "all"; }
+}
+const PAYMENTS_COL_FILTER_NUMERIC_KEYS = ["qty","listingPrice","shippingCharge","gstPct","tcs","tds","settlementAmt","pricePerUnit","otherExpense","netProfit","margin"];
+const PAYMENTS_COL_FILTER_DATE_KEYS = ["dispatchDate","paymentDate"];
+function formatPaymentsColFilterLabel(key, v){
+  switch(key){
+    case "dispatchDate":
+    case "paymentDate": return fmtDateFull(v);
+    case "listingPrice":
+    case "shippingCharge":
+    case "tcs":
+    case "tds":
+    case "settlementAmt":
+    case "pricePerUnit":
+    case "otherExpense":
+    case "netProfit": return fmt(v);
+    case "gstPct": return v+"%";
+    case "margin": return Number(v).toFixed(1)+"%";
+    default: return v.toString();
+  }
+}
+/* Every per-column filter in the payment ledger is a dropdown populated from the actual values
+   present in the data (like a spreadsheet column filter), rather than a free-text box the user
+   has to type an exact match into. Options are built from the full paid-orders universe (not the
+   currently-filtered subset) so picking one filter never hides the options for another. */
+function populatePaymentsColFilterSelects(){
+  const allPaid = orders.filter(o=>o.paymentDetails);
+  document.querySelectorAll("#paymentsColFilterRow select.col-filter-input").forEach(sel=>{
+    const key = sel.dataset.filterKey;
+    const prevVal = paymentsColFilters[key] || "";
+    const rawValues = [...new Set(allPaid.map(o=>getPaymentColValue(o,key)).filter(v=> v!=null && v!==""))];
+    let sorted;
+    if(PAYMENTS_COL_FILTER_NUMERIC_KEYS.includes(key)) sorted = rawValues.slice().sort((a,b)=>Number(a)-Number(b));
+    else if(PAYMENTS_COL_FILTER_DATE_KEYS.includes(key)) sorted = rawValues.slice().sort((a,b)=> a<b?-1:(a>b?1:0));
+    else sorted = rawValues.slice().sort((a,b)=> a.toString().localeCompare(b.toString()));
+    const strValues = sorted.map(v=>v.toString());
+    sel.innerHTML = `<option value="">All</option>` + sorted.map((v,i)=>`<option value="${esc(strValues[i])}">${esc(formatPaymentsColFilterLabel(key,v))}</option>`).join("");
+    sel.value = strValues.includes(prevVal) ? prevVal : "";
+    paymentsColFilters[key] = sel.value;
+  });
 }
 function getFilteredPayments(){
   let list = orders.filter(o=>o.paymentDetails);
@@ -3638,11 +3900,12 @@ function getFilteredPayments(){
   if(paymentsDateToVal) list = list.filter(o=>o.date <= paymentsDateToVal);
   if(paymentsSearchTerm) list = list.filter(o=> o.product.toLowerCase().includes(paymentsSearchTerm) || o.id.toLowerCase().includes(paymentsSearchTerm));
   Object.keys(paymentsColFilters).forEach(key=>{
-    const needle = (paymentsColFilters[key]||"").trim().toLowerCase();
-    if(!needle) return;
+    const filterVal = paymentsColFilters[key];
+    if(!filterVal) return;
     list = list.filter(o=>{
       const v = getPaymentColValue(o, key);
-      return (v==null ? "" : v.toString()).toLowerCase().includes(needle);
+      const vStr = v==null ? "" : v.toString();
+      return vStr === filterVal; // every column filter is now a dropdown, so match the exact value picked
     });
   });
   if(paymentsSort.key){
@@ -4323,6 +4586,18 @@ const MEESHO_RETURN_TYPE_MAP = {
   "CUSTOMER RETURN":"Customer Return", "CUSTOMER_RETURN":"Customer Return", "RETURN":"Customer Return",
   "DOOR STEP EXCHANGE":"Customer Return", "DOOR_STEP_EXCHANGED":"Customer Return", "EXCHANGE":"Customer Return",
 };
+/* Meesho's own "Live Order Status" can still read SHIPPED even after the final settlement has
+   actually been paid out for that order — settlement is only issued once delivery is confirmed on
+   Meesho's side, so a real settlement amount is stronger, more current evidence than a stale
+   "Shipped" label that Meesho just hasn't refreshed yet. Wherever an order's working status is
+   determined (on import, and when reading it back for Payments/Reports), this promotes such orders
+   to "Delivered" so the Orders tab, Payments tab and Reports never disagree with each other. This
+   only ever upgrades Shipped → Delivered — every other status (RTO, Customer Return, Cancelled,
+   Lost, Pending) is left exactly as-is. */
+function resolveOrderStatus(status, settlementAmt){
+  if(status === "Shipped" && settlementAmt!=null) return "Delivered";
+  return status;
+}
 function getField(row, candidates){
   const keys = Object.keys(row);
   for(const cand of candidates){
@@ -4533,11 +4808,14 @@ function processMeeshoPaymentRows(rows, filename){
     const idx = orders.findIndex(o=>o.id===subOrderNo);
     if(idx>-1){
       const keepStatus = ["Customer Return","RTO","RTO_LOCKED"].includes(orders[idx].status);
+      let nextStatus = (mappedStatus && !keepStatus) ? mappedStatus : orders[idx].status;
+      const effectiveBank = bank!=null ? bank : orders[idx].bank;
+      if(!keepStatus) nextStatus = resolveOrderStatus(nextStatus, effectiveBank);
       orders[idx] = {...orders[idx],
         bank: bank!=null ? bank : orders[idx].bank,
         paymentDate: paymentDate || orders[idx].paymentDate,
         fee: fee!=null ? fee : orders[idx].fee,
-        status: (mappedStatus && !keepStatus) ? mappedStatus : orders[idx].status,
+        status: nextStatus,
         sku: orders[idx].sku || sku || orders[idx].sku,
         catalogId: orders[idx].catalogId || catalogId || orders[idx].catalogId,
         paymentDetails, paymentSource: filename,
@@ -4551,7 +4829,7 @@ function processMeeshoPaymentRows(rows, filename){
       orders.push({
         id: subOrderNo, platform:"Meesho", date: orderDate || paymentDate, product, qty,
         sell: listingPrice!=null ? listingPrice : (saleAmount!=null ? saleAmount : (bank||0)), cost,
-        status: mappedStatus || "Delivered", fee: fee!=null ? fee : 0, bank, paymentDate, sku, catalogId, source: filename,
+        status: resolveOrderStatus(mappedStatus || "Delivered", bank), fee: fee!=null ? fee : 0, bank, paymentDate, sku, catalogId, source: filename,
         paymentDetails, paymentOnly: true, paymentSource: filename,
       });
       created++;
@@ -5008,6 +5286,15 @@ function applyPersistedJSON(raw){
     if(Array.isArray(data.orders)){
       orders = data.orders.filter(o=> !(o && LEGACY_DEMO_ORDER_IDS.has(o.id) && !o.source && !o.paymentSource));
     }
+    /* Retroactively fix orders that were imported before the Shipped→Delivered settlement-based
+       correction existed: if Meesho's live status still says Shipped but a real settlement was
+       already recorded for it, promote it now — no re-import needed. */
+    orders.forEach(o=>{
+      if(o.status==="Shipped"){
+        const settlementAmt = (o.paymentDetails && o.paymentDetails.settlementAmount!=null) ? o.paymentDetails.settlementAmount : (o.bank!=null ? o.bank : null);
+        o.status = resolveOrderStatus("Shipped", settlementAmt);
+      }
+    });
     if(Array.isArray(data.returnRecords)) returnRecords = data.returnRecords;
     if(Array.isArray(data.importLog)) importLog = data.importLog;
     if(typeof data.importLogSeq==="number") importLogSeq = data.importLogSeq;
