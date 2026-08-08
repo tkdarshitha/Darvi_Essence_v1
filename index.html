@@ -6025,16 +6025,15 @@ const STORAGE_KEY = "akmr_trade_point_data_v1";
    SAME Firestore document — so your daily updates show up for everyone, and
    they can edit it too. Leave apiKey as "YOUR_API_KEY" to keep the app running
    in local-only mode (today's behavior) if you haven't set this up yet.
-   Darvi Essence needs its OWN Firebase project — it must not share the old
-   company's project/data. Until a new project's config is pasted in here, the
-   app runs in local-only mode (saved to this browser only, no cross-device sync). */
+   Darvi Essence has its OWN Firebase project below — it does not share the
+   old company's project/data. */
 const firebaseConfig = {
-  apiKey: "AIzaSyDlQf9wFzTb6MdbwiVGCuB-6du0oIaFa2s",
-  authDomain: "akmr-trade-point.firebaseapp.com",
-  projectId: "akmr-trade-point",
-  storageBucket: "akmr-trade-point.firebasestorage.app",
-  messagingSenderId: "532323693693",
-  appId: "1:532323693693:web:678f6fc45feed34398ad14"
+  apiKey: "AIzaSyB4oG4slexrvJFSInGGLDODaPuI69jknYs",
+  authDomain: "darvi-essence.firebaseapp.com",
+  projectId: "darvi-essence",
+  storageBucket: "darvi-essence.firebasestorage.app",
+  messagingSenderId: "1027441459150",
+  appId: "1:1027441459150:web:067fd8d60fb116c3b0359f"
 };
 let _cloudEnabled = false;
 let _cloudDb = null;
@@ -6046,7 +6045,7 @@ try{
     _cloudEnabled = true;
   }
 }catch(err){ console.error("Darvi Essence: cloud sync could not start — falling back to this browser only.", err); }
-const CLOUD_DOC = ()=> _cloudDb.collection("akmrTradePoint").doc("sharedState");
+const CLOUD_DOC = ()=> _cloudDb.collection("darviEssence").doc("sharedState");
 
 let _cloudWriteFailed = false;
 function initCloudSync(){
@@ -6241,7 +6240,7 @@ function renderAll(){
    source and isn't cryptographically secret; it's a "keep casual visitors
    out" gate, not bank-grade security. Pair it with the matching Firestore
    rule (see setup notes) so writes are actually rejected without it too. */
-const APP_PASSCODE = "AkmrTrade2026";
+const APP_PASSCODE = "Mandyadarvi";
 const PASSCODE_STORAGE_KEY = "akmr_trade_point_unlocked_v1";
 
 function startApp(){
